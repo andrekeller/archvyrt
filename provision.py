@@ -697,7 +697,10 @@ class Domain:
         """
         Make sure to cleanup connection when object is destroyed
         """
-        self.close()
+        try:
+            self.close()
+        except libvirt.libvirtError:
+            pass
 
     def close(self):
         """
