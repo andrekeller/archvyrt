@@ -1298,6 +1298,16 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument(
+        '--proxy', dest='proxy',
+        default='127.0.0.1:3128',
+        help='Proxy to use when running provisioning commands'
+    )
+    parser.add_argument(
+        '--no-proxy', dest='use_proxy', action='store_false',
+        default=True,
+        help='Disable proxy'
+    )
+    parser.add_argument(
         '--mountpoint', dest='mountpoint',
         default='/provision',
         help='Temporary mountpoint for provisioning'
@@ -1313,7 +1323,11 @@ def main():
 
     if domain.guesttype == 'archlinux':
         os.mkdir(args.mountpoint)
-        provisioner = ArchProvision(domain)
+        if args.use_proxy:
+            proxy = args.proxy
+        else:
+            proxy = None
+        provisioner = ArchProvision(domain, proxy=proxy)
         provisioner.cleanup()
         domain.autostart(True)
         domain.start()
