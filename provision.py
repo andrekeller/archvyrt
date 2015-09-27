@@ -271,7 +271,7 @@ class LibvirtNetwork:
         (returns a list, each element representing a line)
         """
         config = list()
-        config.append('Description=%s Network' % self.name)
+        config.append('Description="%s network"' % self.name)
         config.append('Interface=%s' % self.name)
         config.append('Connection=ethernet')
         if self.ipv4_address:
