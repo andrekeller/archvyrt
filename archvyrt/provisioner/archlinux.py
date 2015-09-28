@@ -1,7 +1,7 @@
 import logging
 import os
 
-from libarchvyrt.provisioner import Base
+from archvyrt.provisioner import Base
 
 LOG = logging.getLogger('archvyrt')
 

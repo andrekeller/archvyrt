@@ -1,9 +1,9 @@
 import libvirt
 import logging
 
-from libarchvyrt.libvirt.domain import LibvirtDomain
-from libarchvyrt.libvirt.disk import LibvirtDisk
-from libarchvyrt.libvirt.network import LibvirtNetwork
+from archvyrt.libvirt.domain import LibvirtDomain
+from archvyrt.libvirt.disk import LibvirtDisk
+from archvyrt.libvirt.network import LibvirtNetwork
 
 LOG = logging.getLogger('archvyrt')
 

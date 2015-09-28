@@ -9,9 +9,9 @@ import json
 import logging
 import os
 
-from libarchvyrt.domain import Domain
-from libarchvyrt.provisioner.archlinux import ArchlinuxProvisioner
-from libarchvyrt.provisioner.plain import PlainProvisioner
+from archvyrt.domain import Domain
+from archvyrt.provisioner.archlinux import ArchlinuxProvisioner
+from archvyrt.provisioner.plain import PlainProvisioner
 
 
 LOG = logging.getLogger(__name__)
