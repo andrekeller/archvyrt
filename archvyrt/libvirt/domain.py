@@ -297,3 +297,11 @@ class LibvirtDomain:
             name_element.text = value
             self._xml.append(name_element)
 
+    @property
+    def xml(self):
+        return self._xml
+
+    @xml.setter
+    def xml(self, value):
+        self._xml = ElementTree.fromstring(value)
+
