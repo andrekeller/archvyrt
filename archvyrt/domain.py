@@ -65,7 +65,7 @@ class Domain:
         will create libvirt disks and attach them to the domain
         """
         for alias, details in sorted(self._domain_info['disks'].items()):
-            disk_name = '%s-%s' % (self.hostname, alias)
+            disk_name = '%s-%s' % (self.fqdn, alias)
             self._disks.append(
                 LibvirtDisk(
                     self._conn,
