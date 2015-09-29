@@ -150,7 +150,7 @@ class ArchlinuxProvisioner(Base):
                         ])
                 else:
                     # create mountpoint
-                    os.mkdir(mountpoint)
+                    os.makedirs(mountpoint)
                 self.run([
                     '/usr/bin/mount',
                     '%sp%d' % (dev, cur_part),
