@@ -46,9 +46,6 @@ class LibvirtNetwork:
         model_element = ElementTree.Element('model')
         model_element.attrib['type'] = 'virtio'
         self._xml.append(model_element)
-        alias_element = ElementTree.Element('alias')
-        alias_element.attrib['name'] = 'virtio-%s' % name
-        self._xml.append(alias_element)
 
     def __str__(self):
         """
@@ -106,10 +103,13 @@ class LibvirtNetwork:
         DNS servers configured for this network (returns a list)
         """
         dns = []
-        for server in self._ipv4.get('dns', []):
-            dns.append(ipaddress.ip_address(server))
-        for server in self._ipv6.get('dns', []):
-            dns.append(ipaddress.ip_address(server))
+        try:
+            for server in self._ipv4.get('dns', []):
+                dns.append(ipaddress.ip_address(server))
+            for server in self._ipv6.get('dns', []):
+                dns.append(ipaddress.ip_address(server))
+        except AttributeError:
+            pass
         return dns
 
     @property
@@ -119,7 +119,7 @@ class LibvirtNetwork:
         """
         try:
             return ipaddress.ip_interface(self._ipv4['address'])
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, TypeError):
             return None
 
     @property
@@ -129,7 +129,7 @@ class LibvirtNetwork:
         """
         try:
             return ipaddress.ip_address(self._ipv4['gateway'])
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, TypeError):
             return None
 
     @property
@@ -139,7 +139,7 @@ class LibvirtNetwork:
         """
         try:
             return ipaddress.ip_interface(self._ipv6['address'])
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, TypeError):
             return None
 
     @property
@@ -149,7 +149,7 @@ class LibvirtNetwork:
         """
         try:
             return ipaddress.ip_address(self._ipv6['gateway'])
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, TypeError):
             return None
 
     @property
@@ -167,8 +167,25 @@ class LibvirtNetwork:
         return self._vlan
 
     @property
+    def mac(self):
+        """
+        MAC address of this interface
+        """
+        try:
+            return self.xml.find('mac').attrib['address']
+        except (KeyError, TypeError):
+            return None
+
+    @property
     def xml(self):
         """
         XML representation of this network device
         """
         return self._xml
+
+    @xml.setter
+    def xml(self, value):
+        """
+        Update XML for interface
+        """
+        self._xml = value

@@ -219,12 +219,26 @@ class ArchlinuxProvisioner(Base):
         Domain network configuration
         """
         LOG.info('Setup guest networking')
+
+        # get provisioned interfaces
+        interfaces = self.domain.et.find('devices').findall('interface')
+
         addresses = []
-        for network in self.domain.networks:
+        udev_lines = []
+        for interface, network in zip(interfaces, self.domain.networks):
+            # update interface xml with provisioned interface
+            # this also includes pci slots and mac-addresses
+            network.xml = interface
             if network.ipv4_address:
                 addresses.append(network.ipv4_address.ip)
             if network.ipv6_address:
                 addresses.append(network.ipv6_address.ip)
+            if network.mac:
+                udev_lines.append(
+                    'SUBSYSTEM=="net", ACTION=="add", '
+                    'ATTR{address}=="%s", NAME="%s"' % (network.mac,
+                                                        network.name)
+                )
             self.writetargetfile(
                 '/etc/netctl/%s' % network.name,
                 network.netctl
@@ -235,6 +249,10 @@ class ArchlinuxProvisioner(Base):
                 network.name
             ])
 
+        self.writetargetfile(
+            '/etc/udev/rules.d/10-network.rules',
+            udev_lines
+        )
         self.writetargetfile('/etc/hostname', [self.domain.hostname, ])
 
         host_entries = [

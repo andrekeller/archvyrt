@@ -1,5 +1,6 @@
 import libvirt
 import logging
+import xml.etree.ElementTree as ElementTree
 
 from archvyrt.libvirt.domain import LibvirtDomain
 from archvyrt.libvirt.disk import LibvirtDisk
@@ -30,6 +31,7 @@ class Domain:
         self._networks = []
         self._init_networks()
         self._conn.defineXML(self.xml)
+        self._domain.xml = self._conn.lookupByName(self.fqdn).XMLDesc()
         LOG.info('New domain %s', self.fqdn)
         LOG.debug(
             'Define new domain %s: %s',
@@ -188,3 +190,10 @@ class Domain:
         XML representaion of this domain
         """
         return str(self._domain)
+
+    @property
+    def et(self):
+        """
+        ElementTree representaion of this domain
+        """
+        return self._domain.xml
