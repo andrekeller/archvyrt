@@ -190,3 +190,10 @@ class Domain:
         XML representaion of this domain
         """
         return str(self._domain)
+
+    @property
+    def et(self):
+        """
+        ElementTree representaion of this domain
+        """
+        return self._domain.xml
