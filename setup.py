@@ -9,7 +9,7 @@ here = path.abspath(path.dirname(__file__))
 
 setup(
     name='archvyrt',
-    version='0.1.1',
+    version='0.2.0',
     description='libvirt provisioner for archlinux libvirt hosts',
     url='https://github.com/andrekeller/archvyrt',
     author='Andre Keller',
