@@ -1227,6 +1227,7 @@ class ArchProvision(Provision):
         ])
         self.runchroot([
             'grub-install',
+            '--target=i386-pc',
             '/dev/nbd0'
         ])
         self.runchroot([
