@@ -6,4 +6,4 @@ dist/
 eggs/
 sdist/
 *.egg-info/
-docs/_build/
+docs/build/
