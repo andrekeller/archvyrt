@@ -48,8 +48,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'archvyrt'
-copyright = '2015, André Keller'
-author = 'André Keller'
+copyright = '2015, Andre Keller'
+author = 'Andre Keller'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
