@@ -6,30 +6,35 @@ from archvyrt.provisioner.base.linux import LinuxProvisioner
 LOG = logging.getLogger('archvyrt')
 
 
-class ArchlinuxProvisioner(LinuxProvisioner):
+class UbuntuProvisioner(LinuxProvisioner):
     """
-    ArchLinux Provisioner
+    Ubuntu Provisioner
     """
 
     def runchroot(self, cmds, output=False, failhard=True, **kwargs):
         """
         Runs a command in the guest
         """
+        run_env = kwargs.pop('env', None)
+        if not run_env:
+            run_env = os.environ.copy()
+        run_env['PATH'] = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         chroot_cmds = [
             '/usr/bin/arch-chroot',
             self.target,
         ]
-        return self.run(chroot_cmds + cmds, output, failhard, **kwargs)
+        return self.run(chroot_cmds + cmds, output, failhard, env=run_env, **kwargs)
 
     def _install(self):
         """
-        ArchLinux base installation
+        Ubuntu base installation
         """
-        LOG.info('Do ArchLinux installation')
+        LOG.info('Do Ubuntu installation')
         self.run([
-            '/usr/bin/pacstrap',
+            '/usr/bin/debootstrap',
+            'trusty',
             self.target,
-            'base'
+            'http://de.archive.ubuntu.com/ubuntu/'
         ])
 
     def _network_config(self):
@@ -41,6 +46,7 @@ class ArchlinuxProvisioner(LinuxProvisioner):
         # get provisioned interfaces
         interfaces = self.domain.et.find('devices').findall('interface')
 
+        dns_servers = []
         addresses = []
         udev_lines = []
         for interface, network in zip(interfaces, self.domain.networks):
@@ -58,14 +64,12 @@ class ArchlinuxProvisioner(LinuxProvisioner):
                                                         network.name)
                 )
             self.writetargetfile(
-                '/etc/netctl/%s' % network.name,
-                network.netctl
+                '/etc/network/interfaces.d/%s' % network.name,
+                network.interfaces
             )
-            self.runchroot([
-                'netctl',
-                'enable',
-                network.name
-            ])
+            if network.dns:
+                for server in network.dns:
+                    dns_servers.append('nameserver %s' % str(server))
 
         self.writetargetfile(
             '/etc/udev/rules.d/10-network.rules',
@@ -87,40 +91,21 @@ class ArchlinuxProvisioner(LinuxProvisioner):
                     )
                 )
         self.writetargetfile('/etc/hosts', host_entries)
+        if dns_servers:
+            self.writetargetfile(
+                '/etc/resolvconf/resolv.conf.d/original',
+                dns_servers
+            )
+            self.writetargetfile(
+                '/etc/resolvconf/resolv.conf.d/tail',
+                dns_servers
+            )
 
     def _locale_config(self):
         """
         Domain locale/language settings
         """
-        LOG.info('Setup locale/language settings')
-        self.writetargetfile('/etc/locale.gen', [
-            'en_US.UTF-8 UTF-8',
-            'de_CH.UTF-8 UTF-8',
-        ])
-        self.writetargetfile('/etc/locale.conf', [
-            'LANG="en_US.UTF-8"',
-            'LC_CTYPE="en_US.UTF-8"',
-            'LC_COLLATE=C',
-            'LC_MESSAGES="en_US.UTF-8"',
-            'LC_MONETARY="de_CH.UTF-8"',
-            'LC_NUMERIC="de_CH.UTF-8"',
-            'LC_PAPER="de_CH.UTF-8"',
-            'LC_TIME="de_CH.UTF-8"',
-        ])
-        self.writetargetfile('/etc/vconsole.conf', [
-            'KEYMAP=sg',
-            'FONT=lat9w-16',
-            'FONT_MAP=8859-1_to_uni',
-        ])
-        self.runchroot([
-            'ln',
-            '-sf',
-            '/usr/share/zoneinfo/Europe/Zurich',
-            '/etc/localtime',
-        ])
-        self.runchroot([
-            'locale-gen',
-        ])
+        pass
 
     def _boot_config(self):
         """
@@ -144,33 +129,22 @@ class ArchlinuxProvisioner(LinuxProvisioner):
                     )
 
         self.writetargetfile('/etc/fstab', ext4_lines + swap_lines, 'a')
-        self.writetargetfile('/etc/mkinitcpio.conf', [
-            'MODULES="virtio virtio_blk virtio_pci virtio_net"',
-            'BINARIES=""',
-            'FILES=""',
-            'HOOKS="base udev autodetect modconf block mdadm_udev lvm2 '
-            'filesystems keyboard fsck"',
-        ])
+        apt_env = os.environ.copy()
+        apt_env['DEBIAN_FRONTEND'] = "noninteractive"
         self.runchroot([
-            'mkinitcpio',
-            '-p',
-            'linux'
-        ])
-        self.runchroot([
-            'pacman',
-            '-Syy',
-            '--noconfirm',
-            'grub'
-        ])
+            'apt-get',
+            '-qy',
+            'install',
+            'grub-pc',
+            'linux-image-virtual'
+        ], env=apt_env)
         self.runchroot([
             'grub-install',
             '--target=i386-pc',
             '/dev/nbd0'
         ])
         self.runchroot([
-            'grub-mkconfig',
-            '-o',
-            '/boot/grub/grub.cfg'
+            'update-grub',
         ])
         # With nbd devices, grub-mkconfig does not use the UUID/LABEL
         # So change it in the resulting file
@@ -178,7 +152,7 @@ class ArchlinuxProvisioner(LinuxProvisioner):
             '/usr/bin/sed',
             '-i',
             '-e',
-            's/vmlinuz-linux root=[^ ]*/vmlinuz-linux root=UUID=%s/' %
+            's/vmlinuz-\(.*\) root=[^ ]*/vmlinuz-\\1 root=UUID=%s/' %
             self._uuid['ext4']['/'],
             '%s/boot/grub/grub.cfg' % self.target
         ])
@@ -188,22 +162,32 @@ class ArchlinuxProvisioner(LinuxProvisioner):
         Domain access configuration such as sudo/ssh and local users
         """
         LOG.info('Setup ssh/local user access')
+        apt_env = os.environ.copy()
+        apt_env['DEBIAN_FRONTEND'] = "noninteractive"
         self.runchroot([
-            'pacman',
-            '-Syy',
-            '--noconfirm',
-            'openssh'
-        ])
+            'apt-get',
+            '-qy',
+            'install',
+            'ssh'
+        ], env=apt_env)
         self.runchroot([
-            'systemctl',
-            'enable',
-            'sshd.service'
+            'service',
+            'ssh',
+            'stop'
         ])
-        self.runchroot([
-            'systemctl',
-            'enable',
-            'getty@ttyS0.service'
-        ])
+        self.writetargetfile(
+            '/etc/init/ttyS0.conf',
+            [
+                '# libvirt console',
+                '',
+                'start on runlevel [23] and not-container',
+                '',
+                'stop on runlevel [!23]',
+                '',
+                'respawn',
+                'exec /sbin/getty -8 38400 ttyS0',
+            ]
+        )
         if self.domain.password:
             self.runchroot([
                 'usermod',
@@ -222,4 +206,3 @@ class ArchlinuxProvisioner(LinuxProvisioner):
                 '/root/.ssh/authorized_keys',
                 authorized_keys
             )
-

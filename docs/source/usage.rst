@@ -94,6 +94,7 @@ top-level key defining the provisioner used to create the vm::
 currently supported types are archlinux and plain
 
 * **archlinux**: Sets up a basic archlinux vm including network and disk config.
+* **ubuntu**: Sets up a basic ubuntu LTS vm including network and disk config.
 * **plain**: Sets up an empty vm to manually install an operating system
   (f.e. using virt-manager)
 
@@ -182,14 +183,15 @@ key for a network is a ``bridge`` which needs to be an openvswitch bridge. If a
 network does not include a ``vlan`` the interface is added to the bridge 
 without a vlan tag.
 
-the ``archlinux`` guesttype will take into account the ``ipv4``/``ipv6`` keys 
-and will configure netctl profiles for each defined network.
+the ``archlinux`` and ``ubuntu`` guesttypes will take into account the
+``ipv4``/``ipv6`` keys and will configure network profiles for each defined
+network.
 
 
 access
 """"""
-
-top-level object configuring root-access for the ``archlinux`` guesttype::
+top-level object configuring root-access for the ``archlinux`` and ``ubuntu``
+guesttypes::
 
     {
       ...,
