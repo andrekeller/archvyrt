@@ -98,6 +98,33 @@ class LibvirtNetwork:
         return config
 
     @property
+    def interfaces(self):
+        """
+        Debian-style interfaces representation of this network device
+
+        (returns a list, each element representing a line)
+        """
+        config = list()
+        config.append('auto %s' % self.name)
+        if not self.ipv4_address and not self.ipv6_address:
+            config.append('iface %s inet manual' % self.name)
+            config.append('  up ifconfig %s up' % self.name)
+        else:
+            if self.ipv4_address:
+                config.append('iface %s inet static' % self.name)
+                config.append('  address %s' % self.ipv4_address.ip)
+                config.append('  netmask %s' % self.ipv4_address.with_prefixlen.split('/', 1)[1])
+                if self.ipv4_gateway:
+                    config.append('  gateway %s' % str(self.ipv4_gateway))
+            if self.ipv6_address:
+                config.append('iface %s inet6 static' % self.name)
+                config.append('  address %s' % self.ipv6_address.ip)
+                config.append('  netmask %s' % self.ipv6_address.with_prefixlen.split('/', 1)[1])
+                if self.ipv6_gateway:
+                    config.append('  gateway %s' % str(self.ipv6_gateway))
+        return config
+
+    @property
     def dns(self):
         """
         DNS servers configured for this network (returns a list)

@@ -1,6 +1,6 @@
 import logging
 
-from archvyrt.provisioner import Base
+from archvyrt.provisioner.base import Base
 
 LOG = logging.getLogger('archvyrt')
 

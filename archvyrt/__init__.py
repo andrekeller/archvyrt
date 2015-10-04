@@ -12,7 +12,7 @@ import os
 from archvyrt.domain import Domain
 from archvyrt.provisioner.archlinux import ArchlinuxProvisioner
 from archvyrt.provisioner.plain import PlainProvisioner
-
+from archvyrt.provisioner.ubuntu import UbuntuProvisioner
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -61,6 +61,17 @@ def main():
         else:
             proxy = None
         provisioner = ArchlinuxProvisioner(domain, proxy=proxy)
+        provisioner.cleanup()
+        domain.autostart(True)
+        domain.start()
+        os.rmdir(args.mountpoint)
+    elif domain.guesttype == 'ubuntu':
+        os.mkdir(args.mountpoint)
+        if args.use_proxy:
+            proxy = args.proxy
+        else:
+            proxy = None
+        provisioner = UbuntuProvisioner(domain, proxy=proxy)
         provisioner.cleanup()
         domain.autostart(True)
         domain.start()
