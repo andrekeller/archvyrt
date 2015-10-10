@@ -200,7 +200,7 @@ class LibvirtDomain:
         os_element = ElementTree.Element('os')
         type_element = ElementTree.Element('type')
         type_element.attrib['arch'] = arch
-        type_element.attrib['machine'] = 'pc-i440fx-2.3'
+        type_element.attrib['machine'] = 'pc'
         type_element.text = 'hvm'
         os_element.append(type_element)
         boot_element = ElementTree.Element('boot')
