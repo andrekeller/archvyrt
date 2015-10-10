@@ -68,6 +68,20 @@ class LinuxProvisioner(Base):
         targetfilename = "%s%s" % (self.target, filename)
         self.writefile(targetfilename, lines, mode)
 
+    def chmodtargetfile(self, filename, chmod):
+        """
+        Change permission of file in the guest
+        """
+        targetfilename = "%s%s" % (self.target, filename)
+        os.chmod(targetfilename, chmod)
+
+    def deletetargetfile(self, filename):
+        """
+        Delete a file in the guest
+        """
+        targetfilename = "%s%s" % (self.target, filename)
+        os.remove(targetfilename)
+
     def cleanup(self):
         """
         Cleanup actions, such as unmounting and disconnecting disks

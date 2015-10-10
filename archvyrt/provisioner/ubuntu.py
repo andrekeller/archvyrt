@@ -163,6 +163,8 @@ class UbuntuProvisioner(LinuxProvisioner):
         Domain access configuration such as sudo/ssh and local users
         """
         LOG.info('Setup ssh/local user access')
+        self.writetargetfile('/usr/sbin/policy-rc.d', ['exit 101'])
+        self.chmodtargetfile('/usr/sbin/policy-rd.d', 0o555)
         apt_env = os.environ.copy()
         apt_env['DEBIAN_FRONTEND'] = "noninteractive"
         self.runchroot([
@@ -171,11 +173,7 @@ class UbuntuProvisioner(LinuxProvisioner):
             'install',
             'ssh'
         ], env=apt_env)
-        self.runchroot([
-            'service',
-            'ssh',
-            'stop'
-        ])
+        self.deletetargetfile('/usr/sbin/policy-rd.d')
         self.writetargetfile(
             '/etc/init/ttyS0.conf',
             [
