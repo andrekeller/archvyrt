@@ -1,6 +1,7 @@
 import logging
 import os
 
+import archvyrt.tools as tools
 from archvyrt.provisioner.base.linux import LinuxProvisioner
 
 LOG = logging.getLogger('archvyrt')
@@ -16,7 +17,7 @@ class ArchlinuxProvisioner(LinuxProvisioner):
         Runs a command in the guest
         """
         chroot_cmds = [
-            '/usr/bin/arch-chroot',
+            tools.ARCH_CHROOT,
             self.target,
         ]
         return self.run(chroot_cmds + cmds, output, failhard, **kwargs)
@@ -27,7 +28,7 @@ class ArchlinuxProvisioner(LinuxProvisioner):
         """
         LOG.info('Do ArchLinux installation')
         self.run([
-            '/usr/bin/pacstrap',
+            tools.PACSTRAP,
             self.target,
             'base'
         ])
@@ -175,7 +176,7 @@ class ArchlinuxProvisioner(LinuxProvisioner):
         # With nbd devices, grub-mkconfig does not use the UUID/LABEL
         # So change it in the resulting file
         self.run([
-            '/usr/bin/sed',
+            tools.SED,
             '-i',
             '-e',
             's/vmlinuz-linux root=[^ ]*/vmlinuz-linux root=UUID=%s/' %

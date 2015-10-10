@@ -1,6 +1,7 @@
 import logging
 import os
 
+import archvyrt.tools as tools
 from archvyrt.provisioner.base import Base
 
 LOG = logging.getLogger('archvyrt')
@@ -84,20 +85,20 @@ class LinuxProvisioner(Base):
             cur_part = 0
             # "mount" qcow2 image file as block device
             self.run([
-                '/usr/bin/qemu-nbd',
+                tools.QEMU_NBD,
                 '-n',
                 '-c',
                 dev,
                 disk.path,
             ])
             self._cleanup.append([
-                '/usr/bin/qemu-nbd',
+                tools.QEMU_NBD,
                 '-d',
                 dev,
             ])
             # create empty partition table
             self.run([
-                '/usr/bin/sgdisk',
+                tools.SGDISK,
                 '-o',
                 dev,
             ])
@@ -105,19 +106,19 @@ class LinuxProvisioner(Base):
             if disk.number == '0':
                 cur_part += 1
                 self.run([
-                    '/usr/bin/sgdisk',
+                    tools.SGDISK,
                     '-n', '%d:2048:4095' % cur_part,
                     '-t', '%d:ef02' % cur_part,
                     dev
                 ])
                 endsector = self.run([
-                    '/usr/bin/sgdisk',
+                    tools.SGDISK,
                     '-E',
                     dev
                 ], output=True).strip()
                 cur_part += 1
                 self.run([
-                    '/usr/bin/sgdisk',
+                    tools.SGDISK,
                     '-n', '%d:4096:%s' % (cur_part, endsector),
                     dev
                 ])
@@ -125,21 +126,21 @@ class LinuxProvisioner(Base):
                 # create single partition
                 cur_part += 1
                 self.run([
-                    '/usr/bin/sgdisk',
+                    tools.SGDISK,
                     '-n', '%d' % cur_part,
                     dev
                 ])
             if disk.fstype == 'ext4':
                 # format ext4
                 self.run([
-                    '/usr/bin/mkfs.ext4',
+                    tools.MKFS_EXT4,
                     '%sp%d' % (dev, cur_part)
                 ])
                 mountpoint = '/provision/%s' % disk.mountpoint.lstrip('/')
                 if disk.mountpoint == '/':
                     # set a filesystem label to aid grub configuration
                     self.run([
-                        '/usr/bin/tune2fs',
+                        tools.TUNE2FS,
                         '-L',
                         'ROOTFS',
                         '%sp%d' % (dev, cur_part),
@@ -148,16 +149,16 @@ class LinuxProvisioner(Base):
                     # create mountpoint
                     os.makedirs(mountpoint)
                 self.run([
-                    '/usr/bin/mount',
+                    tools.MOUNT,
                     '%sp%d' % (dev, cur_part),
                     mountpoint,
                     ])
                 self._cleanup.append([
-                    '/usr/bin/umount',
+                    tools.UMOUNT,
                     mountpoint,
                 ])
                 uuid = self.run([
-                    '/usr/bin/blkid',
+                    tools.BLKID,
                     '-s',
                     'UUID',
                     '-o',
@@ -168,27 +169,27 @@ class LinuxProvisioner(Base):
             elif disk.fstype == 'swap':
                 # set partition type to linux swap
                 self.run([
-                    '/usr/bin/sgdisk',
+                    tools.SGDISK,
                     '-t',
                     '%d:8200' % cur_part,
                     dev
                 ])
                 # format swap space
                 self.run([
-                    '/usr/bin/mkswap',
+                    tools.MKSWAP,
                     '-f',
                     '%sp%d' % (dev, cur_part)
                 ])
                 self.run([
-                    '/usr/bin/swapon',
+                    tools.SWAPON,
                     '%sp%d' % (dev, cur_part)
                 ])
                 self._cleanup.append([
-                    '/usr/bin/swapoff',
+                    tools.SWAPOFF,
                     '%sp%d' % (dev, cur_part)
                 ])
                 uuid = self.run([
-                    '/usr/bin/blkid',
+                    tools.BLKID,
                     '-s',
                     'UUID',
                     '-o',

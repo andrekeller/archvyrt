@@ -1,6 +1,7 @@
 import logging
 import os
 
+import archvyrt.tools as tools
 from archvyrt.provisioner.base.linux import LinuxProvisioner
 
 LOG = logging.getLogger('archvyrt')
@@ -20,7 +21,7 @@ class UbuntuProvisioner(LinuxProvisioner):
             run_env = os.environ.copy()
         run_env['PATH'] = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         chroot_cmds = [
-            '/usr/bin/arch-chroot',
+            tools.ARCH_CHROOT,
             self.target,
         ]
         return self.run(chroot_cmds + cmds, output, failhard, env=run_env, **kwargs)
@@ -31,7 +32,7 @@ class UbuntuProvisioner(LinuxProvisioner):
         """
         LOG.info('Do Ubuntu installation')
         self.run([
-            '/usr/bin/debootstrap',
+            tools.DEBOOTSTRAP,
             'trusty',
             self.target,
             'http://de.archive.ubuntu.com/ubuntu/'
@@ -149,7 +150,7 @@ class UbuntuProvisioner(LinuxProvisioner):
         # With nbd devices, grub-mkconfig does not use the UUID/LABEL
         # So change it in the resulting file
         self.run([
-            '/usr/bin/sed',
+            tools.SED,
             '-i',
             '-e',
             's/vmlinuz-\(.*\) root=[^ ]*/vmlinuz-\\1 root=UUID=%s/' %
