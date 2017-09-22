@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'archvyrt'
-copyright = '2015, Andre Keller'
+copyright = '2015-2017, Andre Keller'
 author = 'Andre Keller'
 
 # The version info for the project you're documenting, acts as replacement for
