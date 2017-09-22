@@ -162,8 +162,7 @@ class LibvirtDomain:
         """
         video_element = ElementTree.Element('video')
         model_element = ElementTree.Element('model')
-        model_element.attrib['type'] = 'cirrus'
-        model_element.attrib['vram'] = '16384'
+        model_element.attrib['type'] = 'virtio'
         model_element.attrib['heads'] = '1'
         video_element.append(model_element)
         alias_element = ElementTree.Element('alias')
