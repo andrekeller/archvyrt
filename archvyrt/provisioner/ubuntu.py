@@ -33,9 +33,9 @@ class UbuntuProvisioner(LinuxProvisioner):
         LOG.info('Do Ubuntu installation')
         self.run([
             tools.DEBOOTSTRAP,
-            'trusty',
+            'xenial',
             self.target,
-            'http://de.archive.ubuntu.com/ubuntu/'
+            'http://ch.archive.ubuntu.com/ubuntu/'
         ])
 
     def _network_config(self):
@@ -144,6 +144,19 @@ class UbuntuProvisioner(LinuxProvisioner):
             '--target=i386-pc',
             '/dev/nbd0'
         ])
+        # Enable serial console
+        self.runchroot([
+            'systemctl',
+            'enable',
+            'getty@ttyS0.service'
+        ])
+        # Remove quiet and splash option
+        self.runchroot([
+            'sed',
+            '-i',
+            's/^\(GRUB_CMDLINE_LINUX_DEFAULT=\).*/\\1""/',
+            '/etc/default/grub'
+        ])
         self.runchroot([
             'update-grub',
         ])
@@ -174,19 +187,6 @@ class UbuntuProvisioner(LinuxProvisioner):
             'ssh'
         ], env=apt_env)
         self.deletetargetfile('/usr/sbin/policy-rc.d')
-        self.writetargetfile(
-            '/etc/init/ttyS0.conf',
-            [
-                '# libvirt console',
-                '',
-                'start on runlevel [23] and not-container',
-                '',
-                'stop on runlevel [!23]',
-                '',
-                'respawn',
-                'exec /sbin/getty -8 38400 ttyS0',
-            ]
-        )
         if self.domain.password:
             self.runchroot([
                 'usermod',
