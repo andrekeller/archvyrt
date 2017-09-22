@@ -84,6 +84,3 @@ def main():
         raise RuntimeError('Unsupported guest type: %s' % domain.guesttype)
 
     domain.close()
-
-if __name__ == '__main__':
-    main()
