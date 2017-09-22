@@ -32,13 +32,8 @@ def main():
     )
     parser.add_argument(
         '--proxy', dest='proxy',
-        default='127.0.0.1:3128',
+        default=None,
         help='Proxy to use when running provisioning commands'
-    )
-    parser.add_argument(
-        '--no-proxy', dest='use_proxy', action='store_false',
-        default=True,
-        help='Disable proxy'
     )
     parser.add_argument(
         '--mountpoint', dest='mountpoint',
@@ -56,22 +51,14 @@ def main():
 
     if domain.guesttype == 'archlinux':
         os.mkdir(args.mountpoint)
-        if args.use_proxy:
-            proxy = args.proxy
-        else:
-            proxy = None
-        provisioner = ArchlinuxProvisioner(domain, proxy=proxy)
+        provisioner = ArchlinuxProvisioner(domain, proxy=args.proxy)
         provisioner.cleanup()
         domain.autostart(True)
         domain.start()
         os.rmdir(args.mountpoint)
     elif domain.guesttype == 'ubuntu':
         os.mkdir(args.mountpoint)
-        if args.use_proxy:
-            proxy = args.proxy
-        else:
-            proxy = None
-        provisioner = UbuntuProvisioner(domain, proxy=proxy)
+        provisioner = UbuntuProvisioner(domain, proxy=args.proxy)
         provisioner.cleanup()
         domain.autostart(True)
         domain.start()
