@@ -3,13 +3,10 @@ archvyrt setup module.
 """
 
 from setuptools import setup, find_packages
-from os import path
-
-here = path.abspath(path.dirname(__file__))
 
 setup(
     name='archvyrt',
-    version='0.3.5',
+    version='0.4.0',
     description='libvirt provisioner for archlinux libvirt hosts',
     url='https://github.com/andrekeller/archvyrt',
     author='Andre Keller',
