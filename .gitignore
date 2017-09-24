@@ -1,10 +1,8 @@
+*.pyc
+/.idea/
+/archvyrt.egg-info/
+/pyvenv/
 __pycache__/
-*.py[cod]
-*$py.class
 build/
 dist/
-eggs/
-sdist/
-*.egg-info/
 docs/build/
-/pyvenv/
