@@ -157,16 +157,15 @@ top-level object defining network interfaces assigned to a vm::
       "networks": {
         "net0": {
           "ipv4": {
-            "address": "91.199.218.9/27",
-            "gateway": "91.199.218.1",
+            "address": "192.0.2.200/24",
+            "gateway": "192.0.2.1",
             "dns": [
-              "8.8.8.8",
-              "8.8.4.4"
+              "203.0.113.1"
             ]
           },
           "ipv6": {
-            "address": "2001:67c:2d70:201::9/64",
-            "gateway": "2001:67c:2d70:201::1"
+            "address": "2001:db8:1234::200/64",
+            "gateway": "2001:db8:1234::1"
           },
           "vlan": "201",
           "bridge": "ovs0"
