@@ -13,6 +13,7 @@ from archvyrt.domain import Domain
 from archvyrt.provisioner.archlinux import ArchlinuxProvisioner
 from archvyrt.provisioner.plain import PlainProvisioner
 from archvyrt.provisioner.ubuntu import UbuntuProvisioner
+from archvyrt.version import __version__
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -28,7 +29,8 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="LibVirt VM provisioner",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        prog='archvyrt',
     )
     parser.add_argument(
         '--proxy', dest='proxy',
@@ -39,6 +41,10 @@ def main():
         '--mountpoint', dest='mountpoint',
         default='/provision',
         help='Temporary mountpoint for provisioning'
+    )
+    parser.add_argument(
+        '-v', '--version',
+        action='version', version='%(prog)s ' + __version__
     )
     parser.add_argument(
         'vmdefinition',
