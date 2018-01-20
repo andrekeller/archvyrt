@@ -1,3 +1,8 @@
+"""archvyrt tools module
+
+this module lists all external commands used by archvyrt
+"""
+
 ARCH_CHROOT = '/usr/bin/arch-chroot'
 BLKID = '/usr/bin/blkid'
 DEBOOTSTRAP = '/usr/bin/debootstrap'

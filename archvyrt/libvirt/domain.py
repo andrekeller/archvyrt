@@ -1,8 +1,10 @@
+"""archvyrt libvirt domain module"""
+
 import logging
 import xml.etree.ElementTree as ElementTree
 import xml.dom.minidom
 
-LOG = logging.getLogger('archvyrt')
+LOG = logging.getLogger(__name__)
 
 
 class LibvirtDomain:
@@ -298,9 +300,11 @@ class LibvirtDomain:
 
     @property
     def xml(self):
+        """
+        Return xml representaion of libvirt domain
+        """
         return self._xml
 
     @xml.setter
     def xml(self, value):
         self._xml = ElementTree.fromstring(value)
-

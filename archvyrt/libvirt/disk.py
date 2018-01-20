@@ -1,10 +1,14 @@
-import libvirt
+"""archvyrt libvirt disk module"""
+
+# stdlib
 import logging
 import re
 import xml.etree.ElementTree as ElementTree
 import xml.dom.minidom
+# 3rd-party
+import libvirt
 
-LOG = logging.getLogger('archvyrt')
+LOG = logging.getLogger(__name__)
 
 
 class LibvirtDisk:

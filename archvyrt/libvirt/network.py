@@ -1,9 +1,11 @@
+"""archvyrt libvirt network module"""
+
 import ipaddress
 import logging
 import xml.etree.ElementTree as ElementTree
 import xml.dom.minidom
 
-LOG = logging.getLogger('archvyrt')
+LOG = logging.getLogger(__name__)
 
 
 class LibvirtNetwork:

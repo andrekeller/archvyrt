@@ -1,8 +1,11 @@
-import logging
+"""archvyrt plain provisioner"""
 
+# stdlib
+import logging
+# archvyrt
 from archvyrt.provisioner.base import Base
 
-LOG = logging.getLogger('archvyrt')
+LOG = logging.getLogger(__name__)
 
 
 class PlainProvisioner(Base):

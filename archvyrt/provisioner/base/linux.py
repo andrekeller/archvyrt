@@ -1,10 +1,13 @@
+"""archvyrt linux base provisioner"""
+
+# stdlib
 import logging
 import os
-
+# archvyrt
 import archvyrt.tools as tools
 from archvyrt.provisioner.base import Base
 
-LOG = logging.getLogger('archvyrt')
+LOG = logging.getLogger(__name__)
 
 
 class LinuxProvisioner(Base):
@@ -212,7 +215,7 @@ class LinuxProvisioner(Base):
                     ], output=True).strip()
                 self._uuid.setdefault('swap', []).append(uuid)
             else:
-                raise RuntimeError('Unsupported fstype %s', disk.fstype)
+                raise RuntimeError('Unsupported fstype %s' % disk.fstype)
 
     def _install(self):
         """

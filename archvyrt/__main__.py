@@ -1,4 +1,6 @@
 """archvyrt helper to run uninstalled version"""
 
 import archvyrt
-archvyrt.main()
+
+if __name__ == '__main__':
+    archvyrt.main()

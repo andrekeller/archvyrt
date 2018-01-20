@@ -1,12 +1,15 @@
-import libvirt
-import logging
-import xml.etree.ElementTree as ElementTree
+"""archvyrt domain module"""
 
+# stdlib
+import logging
+# 3rd-party
+import libvirt
+# archvyrt
 from archvyrt.libvirt.domain import LibvirtDomain
 from archvyrt.libvirt.disk import LibvirtDisk
 from archvyrt.libvirt.network import LibvirtNetwork
 
-LOG = logging.getLogger('archvyrt')
+LOG = logging.getLogger(__name__)
 
 
 class Domain:
@@ -126,6 +129,7 @@ class Domain:
         """
         if self._domain_info.get('access', {}):
             return self._domain_info.get('access').get('ssh-keys', {})
+        return None
 
     @property
     def password(self):
@@ -134,6 +138,7 @@ class Domain:
         """
         if self._domain_info.get('access', {}):
             return self._domain_info.get('access').get('password', None)
+        return None
 
     @property
     def guesttype(self):
@@ -190,10 +195,3 @@ class Domain:
         XML representaion of this domain
         """
         return str(self._domain)
-
-    @property
-    def et(self):
-        """
-        ElementTree representaion of this domain
-        """
-        return self._domain.xml

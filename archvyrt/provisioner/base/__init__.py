@@ -1,8 +1,9 @@
+"""archvyrt base provisioner module"""
 import logging
 import os
 import subprocess
 
-LOG = logging.getLogger('archvyrt')
+LOG = logging.getLogger(__name__)
 
 
 class Base:
@@ -46,9 +47,12 @@ class Base:
                     stderr=devnull,
                     **kwargs
                 )
-            if not rval == 0:
+            if rval != 0:
                 if failhard:
-                    raise RuntimeError('Command %s failed, env: %s' % (" ".join(cmds), kwargs.get('env', 'default')))
+                    raise RuntimeError(
+                        'Command %s failed, env: %s' % (" ".join(cmds),
+                                                        kwargs.get('env', 'default'))
+                    )
         return rval
 
     @staticmethod

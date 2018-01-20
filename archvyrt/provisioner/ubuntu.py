@@ -1,10 +1,13 @@
+"""archvyrt ubuntu provisioner module"""
+
+# stdlib
 import logging
 import os
-
+# archvyrt
 import archvyrt.tools as tools
 from archvyrt.provisioner.base.linux import LinuxProvisioner
 
-LOG = logging.getLogger('archvyrt')
+LOG = logging.getLogger(__name__)
 
 
 class UbuntuProvisioner(LinuxProvisioner):
@@ -154,6 +157,7 @@ class UbuntuProvisioner(LinuxProvisioner):
         self.runchroot([
             'sed',
             '-i',
+            # pylint: disable=anomalous-backslash-in-string
             's/^\(GRUB_CMDLINE_LINUX_DEFAULT=\).*/\\1""/',
             '/etc/default/grub'
         ])
@@ -166,6 +170,7 @@ class UbuntuProvisioner(LinuxProvisioner):
             tools.SED,
             '-i',
             '-e',
+            # pylint: disable=anomalous-backslash-in-string
             's/vmlinuz-\(.*\) root=[^ ]*/vmlinuz-\\1 root=UUID=%s/' %
             self._uuid['ext4']['/'],
             '%s/boot/grub/grub.cfg' % self.target

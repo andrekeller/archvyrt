@@ -1,10 +1,13 @@
+"""archvyrt archlinux provisioner module"""
+
+# stdlib
 import logging
 import os
-
+# archvyrt
 import archvyrt.tools as tools
 from archvyrt.provisioner.base.linux import LinuxProvisioner
 
-LOG = logging.getLogger('archvyrt')
+LOG = logging.getLogger(__name__)
 
 
 class ArchlinuxProvisioner(LinuxProvisioner):
@@ -223,4 +226,3 @@ class ArchlinuxProvisioner(LinuxProvisioner):
                 '/root/.ssh/authorized_keys',
                 authorized_keys
             )
-
