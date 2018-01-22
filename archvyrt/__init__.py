@@ -75,5 +75,3 @@ def main():
         domain.autostart(True)
     else:
         raise RuntimeError('Unsupported guest type: %s' % domain.guesttype)
-
-    domain.close()

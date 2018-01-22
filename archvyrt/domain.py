@@ -49,19 +49,13 @@ class Domain:
         Make sure to cleanup connection when object is destroyed
         """
         try:
-            self.close()
+            if self._conn:
+                try:
+                    self._conn.close()
+                except libvirt.libvirtError:
+                    pass
         except libvirt.libvirtError:
             pass
-
-    def close(self):
-        """
-        Close libvirt connection, if established
-        """
-        if self._conn:
-            try:
-                self._conn.close()
-            except libvirt.libvirtError:
-                pass
 
     def _init_disks(self):
         """
