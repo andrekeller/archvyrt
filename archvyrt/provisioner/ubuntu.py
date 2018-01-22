@@ -113,26 +113,9 @@ class UbuntuProvisioner(LinuxProvisioner):
 
     def _boot_config(self):
         """
-        Domain fstab, bootloader, initrd configuration
+        Domain bootloader, initrd configuration
         """
         LOG.info('Setup boot configuration')
-        swap_lines = []
-        ext4_lines = []
-        for key, value in self._uuid.items():
-            fsckcount = 0
-            if key == 'swap':
-                for uuid in value:
-                    swap_lines.append("UUID=%s none swap defaults 0 0" % uuid)
-            elif key == 'ext4':
-                for mountpoint, uuid in sorted(value.items()):
-                    fsckcount += 1
-                    ext4_lines.append(
-                        "UUID=%s %s ext4 rw,relatime,data=ordered 0 %d" % (
-                            uuid, mountpoint, fsckcount
-                        )
-                    )
-
-        self.writetargetfile('/etc/fstab', ext4_lines + swap_lines, 'a')
         apt_env = os.environ.copy()
         apt_env['DEBIAN_FRONTEND'] = "noninteractive"
         self.runchroot([

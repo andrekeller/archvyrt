@@ -95,6 +95,7 @@ class LinuxProvisioner(Provisioner):
         self._install()
         self._network_config()
         self._locale_config()
+        self._fstab_config()
         self._boot_config()
         self._access_config()
 
@@ -301,9 +302,31 @@ class LinuxProvisioner(Provisioner):
         """
         raise NotImplementedError
 
+    def _fstab_config(self):
+        """
+        Domain fstab configuration
+        """
+        LOG.info('Write fstab configuration')
+        swap_lines = []
+        ext4_lines = []
+        for key, value in self._uuid.items():
+            fsckcount = 0
+            if key == 'swap':
+                for uuid in value:
+                    swap_lines.append("UUID=%s none swap defaults 0 0" % uuid)
+            elif key == 'ext4':
+                for mountpoint, uuid in sorted(value.items()):
+                    fsckcount += 1
+                    ext4_lines.append(
+                        "UUID=%s %s ext4 rw,relatime,data=ordered 0 %d" % (
+                            uuid, mountpoint, fsckcount
+                        )
+                    )
+        self.writetargetfile('/etc/fstab', ext4_lines + swap_lines, 'a')
+
     def _boot_config(self):
         """
-        Domain fstab, bootloader, initrd configuration
+        Domain bootloader, initrd configuration
         """
         raise NotImplementedError
 
