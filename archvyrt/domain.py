@@ -8,6 +8,7 @@ import libvirt
 from archvyrt.libvirt import LibvirtDomain
 from archvyrt.libvirt import LibvirtDisk
 from archvyrt.libvirt import LibvirtNetwork
+from archvyrt.libvirt import LibvirtRng
 
 LOG = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ class Domain:
         self._init_disks()
         self._networks = []
         self._init_networks()
+        self._init_rng()
         self._conn.defineXML(str(self._domain))
         self._domain.xml = self._conn.lookupByName(self.fqdn).XMLDesc()
         LOG.info('New domain %s', self.fqdn)
@@ -96,6 +98,14 @@ class Domain:
         for network in self._networks:
             self._domain.add_device(network.xml)
             LOG.debug('Add network %s to domain %s', network.name, self.fqdn)
+
+    def _init_rng(self):
+        """Initialize rng"""
+        if 'rng' in self._domain_info:
+            rng_bytes = self._domain_info['rng'].get('bytes', 2048)
+            rng = LibvirtRng(rng_bytes=rng_bytes)
+            self._domain.add_device(rng.xml)
+            LOG.debug('Add rng to domain %s', self.fqdn)
 
     def start(self):
         """
