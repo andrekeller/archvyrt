@@ -10,9 +10,9 @@ import logging
 import os
 
 from archvyrt.domain import Domain
-from archvyrt.provisioner.archlinux import ArchlinuxProvisioner
-from archvyrt.provisioner.plain import PlainProvisioner
-from archvyrt.provisioner.ubuntu import UbuntuProvisioner
+from archvyrt.provisioner import ArchlinuxProvisioner
+from archvyrt.provisioner import PlainProvisioner
+from archvyrt.provisioner import UbuntuProvisioner
 from archvyrt.version import __version__
 
 LOG = logging.getLogger(__name__)

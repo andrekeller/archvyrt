@@ -3,12 +3,12 @@
 # stdlib
 import logging
 # archvyrt
-from archvyrt.provisioner.base import Base
+from archvyrt.provisioner.base import Provisioner
 
 LOG = logging.getLogger(__name__)
 
 
-class PlainProvisioner(Base):
+class PlainProvisioner(Provisioner):
     """
     Plain Provisioner
     """

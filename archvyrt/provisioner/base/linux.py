@@ -5,12 +5,12 @@ import logging
 import os
 # archvyrt
 import archvyrt.tools as tools
-from archvyrt.provisioner.base import Base
+from archvyrt.provisioner.base import Provisioner
 
 LOG = logging.getLogger(__name__)
 
 
-class LinuxProvisioner(Base):
+class LinuxProvisioner(Provisioner):
     """
     Linux Provisioner
     """

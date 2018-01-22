@@ -5,9 +5,9 @@ import logging
 # 3rd-party
 import libvirt
 # archvyrt
-from archvyrt.libvirt.domain import LibvirtDomain
-from archvyrt.libvirt.disk import LibvirtDisk
-from archvyrt.libvirt.network import LibvirtNetwork
+from archvyrt.libvirt import LibvirtDomain
+from archvyrt.libvirt import LibvirtDisk
+from archvyrt.libvirt import LibvirtNetwork
 
 LOG = logging.getLogger(__name__)
 
