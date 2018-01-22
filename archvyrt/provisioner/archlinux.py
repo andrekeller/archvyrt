@@ -15,26 +15,16 @@ class ArchlinuxProvisioner(LinuxProvisioner):
     ArchLinux Provisioner
     """
 
-    def runchroot(self, cmds, output=False, failhard=True, **kwargs):
-        """
-        Runs a command in the guest
-        """
-        chroot_cmds = [
-            tools.ARCH_CHROOT,
-            self.target,
-        ]
-        return self.run(chroot_cmds + cmds, output, failhard, **kwargs)
-
     def _install(self):
         """
         ArchLinux base installation
         """
         LOG.info('Do ArchLinux installation')
-        self.run([
+        self.run(
             tools.PACSTRAP,
             self.target,
             'base'
-        ])
+        )
 
     def _network_config(self):
         """
@@ -65,11 +55,11 @@ class ArchlinuxProvisioner(LinuxProvisioner):
                 '/etc/netctl/%s' % network.name,
                 network.netctl
             )
-            self.runchroot([
+            self.runchroot(
                 'netctl',
                 'enable',
                 network.name
-            ])
+            )
 
         self.writetargetfile(
             '/etc/udev/rules.d/10-network.rules',
@@ -116,15 +106,15 @@ class ArchlinuxProvisioner(LinuxProvisioner):
             'FONT=lat9w-16',
             'FONT_MAP=8859-1_to_uni',
         ])
-        self.runchroot([
+        self.runchroot(
             'ln',
             '-sf',
             '/usr/share/zoneinfo/Europe/Zurich',
             '/etc/localtime',
-        ])
-        self.runchroot([
+        )
+        self.runchroot(
             'locale-gen',
-        ])
+        )
 
     def _boot_config(self):
         """
@@ -138,66 +128,66 @@ class ArchlinuxProvisioner(LinuxProvisioner):
             'HOOKS="base udev autodetect modconf block mdadm_udev lvm2 '
             'filesystems keyboard fsck"',
         ])
-        self.runchroot([
+        self.runchroot(
             'mkinitcpio',
             '-p',
             'linux'
-        ])
-        self.runchroot([
+        )
+        self.runchroot(
             'pacman',
             '-Syy',
             '--noconfirm',
             'grub'
-        ])
-        self.runchroot([
+        )
+        self.runchroot(
             'grub-install',
             '--target=i386-pc',
             '/dev/nbd0'
-        ])
-        self.runchroot([
+        )
+        self.runchroot(
             'grub-mkconfig',
             '-o',
             '/boot/grub/grub.cfg'
-        ])
+        )
         # With nbd devices, grub-mkconfig does not use the UUID/LABEL
         # So change it in the resulting file
-        self.run([
+        self.run(
             tools.SED,
             '-i',
             '-e',
             's/vmlinuz-linux root=[^ ]*/vmlinuz-linux root=UUID=%s/' %
             self._uuid['ext4']['/'],
             '%s/boot/grub/grub.cfg' % self.target
-        ])
+        )
 
     def _access_config(self):
         """
         Domain access configuration such as sudo/ssh and local users
         """
         LOG.info('Setup ssh/local user access')
-        self.runchroot([
+        self.runchroot(
             'pacman',
             '-Syy',
             '--noconfirm',
             'openssh'
-        ])
-        self.runchroot([
+        )
+        self.runchroot(
             'systemctl',
             'enable',
             'sshd.service'
-        ])
-        self.runchroot([
+        )
+        self.runchroot(
             'systemctl',
             'enable',
             'getty@ttyS0.service'
-        ])
+        )
         if self.domain.password:
-            self.runchroot([
+            self.runchroot(
                 'usermod',
                 '-p',
                 self.domain.password,
                 'root'
-            ])
+            )
         if self.domain.sshkeys:
             authorized_keys = []
             for key, value in self.domain.sshkeys.items():

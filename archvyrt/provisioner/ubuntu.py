@@ -15,31 +15,17 @@ class UbuntuProvisioner(LinuxProvisioner):
     Ubuntu Provisioner
     """
 
-    def runchroot(self, cmds, output=False, failhard=True, **kwargs):
-        """
-        Runs a command in the guest
-        """
-        run_env = kwargs.pop('env', None)
-        if not run_env:
-            run_env = os.environ.copy()
-        run_env['PATH'] = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-        chroot_cmds = [
-            tools.ARCH_CHROOT,
-            self.target,
-        ]
-        return self.run(chroot_cmds + cmds, output, failhard, env=run_env, **kwargs)
-
     def _install(self):
         """
         Ubuntu base installation
         """
         LOG.info('Do Ubuntu installation')
-        self.run([
+        self.run(
             tools.DEBOOTSTRAP,
             'xenial',
             self.target,
             'http://ch.archive.ubuntu.com/ubuntu/'
-        ])
+        )
 
     def _network_config(self):
         """
@@ -116,40 +102,40 @@ class UbuntuProvisioner(LinuxProvisioner):
         Domain bootloader, initrd configuration
         """
         LOG.info('Setup boot configuration')
-        apt_env = os.environ.copy()
-        apt_env['DEBIAN_FRONTEND'] = "noninteractive"
-        self.runchroot([
+        apt_env = {'DEBIAN_FRONTEND': "noninteractive"}
+        self.runchroot(
             'apt-get',
             '-qy',
             'install',
             'grub-pc',
-            'linux-image-virtual'
-        ], env=apt_env)
-        self.runchroot([
+            'linux-image-virtual',
+            add_env=apt_env
+        )
+        self.runchroot(
             'grub-install',
             '--target=i386-pc',
             '/dev/nbd0'
-        ])
+        )
         # Enable serial console
-        self.runchroot([
+        self.runchroot(
             'systemctl',
             'enable',
             'getty@ttyS0.service'
-        ])
+        )
         # Remove quiet and splash option
-        self.runchroot([
+        self.runchroot(
             'sed',
             '-i',
             # pylint: disable=anomalous-backslash-in-string
             's/^\(GRUB_CMDLINE_LINUX_DEFAULT=\).*/\\1""/',
             '/etc/default/grub'
-        ])
-        self.runchroot([
+        )
+        self.runchroot(
             'update-grub',
-        ])
+        )
         # With nbd devices, grub-mkconfig does not use the UUID/LABEL
         # So change it in the resulting file
-        self.run([
+        self.run(
             tools.SED,
             '-i',
             '-e',
@@ -157,7 +143,7 @@ class UbuntuProvisioner(LinuxProvisioner):
             's/vmlinuz-\(.*\) root=[^ ]*/vmlinuz-\\1 root=UUID=%s/' %
             self._uuid['ext4']['/'],
             '%s/boot/grub/grub.cfg' % self.target
-        ])
+        )
 
     def _access_config(self):
         """
@@ -166,22 +152,22 @@ class UbuntuProvisioner(LinuxProvisioner):
         LOG.info('Setup ssh/local user access')
         self.writetargetfile('/usr/sbin/policy-rc.d', ['exit 101'])
         self.chmodtargetfile('/usr/sbin/policy-rc.d', 0o555)
-        apt_env = os.environ.copy()
-        apt_env['DEBIAN_FRONTEND'] = "noninteractive"
-        self.runchroot([
+        apt_env = {'DEBIAN_FRONTEND': "noninteractive"}
+        self.runchroot(
             'apt-get',
             '-qy',
             'install',
-            'ssh'
-        ], env=apt_env)
+            'ssh',
+            add_env=apt_env
+        )
         self.deletetargetfile('/usr/sbin/policy-rc.d')
         if self.domain.password:
-            self.runchroot([
+            self.runchroot(
                 'usermod',
                 '-p',
                 self.domain.password,
                 'root'
-            ])
+            )
         if self.domain.sshkeys:
             authorized_keys = []
             for key, value in self.domain.sshkeys.items():
