@@ -33,7 +33,7 @@ class ArchlinuxProvisioner(LinuxProvisioner):
         LOG.info('Setup guest networking')
 
         # get provisioned interfaces
-        interfaces = self.domain.et.find('devices').findall('interface')
+        interfaces = self.domain.xml.find('devices').findall('interface')
 
         addresses = []
         udev_lines = []

@@ -33,13 +33,13 @@ class Domain:
         self._init_disks()
         self._networks = []
         self._init_networks()
-        self._conn.defineXML(self.xml)
+        self._conn.defineXML(str(self._domain))
         self._domain.xml = self._conn.lookupByName(self.fqdn).XMLDesc()
         LOG.info('New domain %s', self.fqdn)
         LOG.debug(
             'Define new domain %s: %s',
             self.fqdn,
-            self.xml.replace('\n', ' ').replace('\r', '')
+            str(self._domain).replace('\n', ' ').replace('\r', '')
         )
 
     def __del__(self):
@@ -192,6 +192,6 @@ class Domain:
     @property
     def xml(self):
         """
-        XML representaion of this domain
+        Libvirt XML for this domain (provisioned state)
         """
-        return str(self._domain)
+        return self._domain.xml

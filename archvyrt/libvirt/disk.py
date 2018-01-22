@@ -4,14 +4,15 @@
 import logging
 import re
 import xml.etree.ElementTree as ElementTree
-import xml.dom.minidom
 # 3rd-party
 import libvirt
+# archvyrt
+from .xml import LibvirtXml
 
 LOG = logging.getLogger(__name__)
 
 
-class LibvirtDisk:
+class LibvirtDisk(LibvirtXml):
     """
     LibVirt Disk device object.
     """
@@ -32,6 +33,7 @@ class LibvirtDisk:
                          mountpoint - Where to mount the disk in the guest
                          capacity - Disk capacity in GB
         """
+        super().__init__()
 
         self._alias = alias
         self._name = name
@@ -84,25 +86,7 @@ class LibvirtDisk:
         format_element.attrib['type'] = 'qcow2'
         target_element.append(format_element)
         volume_xml.append(target_element)
-        return self.__format_xml(volume_xml)
-
-    @staticmethod
-    def __format_xml(et_xml):
-        """
-        Return a pretty formatted XML
-
-        :param et_xml - ElementTree XML object
-        """
-        reparsed = xml.dom.minidom.parseString(
-            ElementTree.tostring(et_xml, encoding='unicode')
-        )
-        return reparsed.toprettyxml(indent="  ").strip()
-
-    def __str__(self):
-        """
-        Return a pretty formatted XML representation of this disk
-        """
-        return self.__format_xml(self._xml)
+        return self.format_xml(volume_xml)
 
     @property
     def mountpoint(self):
@@ -166,10 +150,3 @@ class LibvirtDisk:
         Target (guest) device name for this disk (vda, vdb, vdc...)
         """
         return self._properties.get('target')
-
-    @property
-    def xml(self):
-        """
-        ElementTree XML object of this disk
-        """
-        return self._xml

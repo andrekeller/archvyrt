@@ -1,13 +1,15 @@
 """archvyrt libvirt domain module"""
 
+# stdlib
 import logging
 import xml.etree.ElementTree as ElementTree
-import xml.dom.minidom
+# archvyrt
+from .xml import LibvirtXml
 
 LOG = logging.getLogger(__name__)
 
 
-class LibvirtDomain:
+class LibvirtDomain(LibvirtXml):
     """
     Libvirt Domain object
     """
@@ -18,20 +20,12 @@ class LibvirtDomain:
 
         :param name - FQDN of domain
         """
+        super().__init__()
         self._xml = ElementTree.Element('domain')
         self._xml.attrib['type'] = 'kvm'
         self.name = name
         self._set_default_behaviour()
         self._set_default_hardware()
-
-    def __str__(self):
-        """
-        Pretty formatted XML representation of this domain
-        """
-        reparsed = xml.dom.minidom.parseString(
-            ElementTree.tostring(self._xml, encoding='unicode')
-        )
-        return reparsed.toprettyxml(indent="  ").strip()
 
     def _set_default_behaviour(self):
         """
@@ -297,14 +291,3 @@ class LibvirtDomain:
             name_element = ElementTree.Element('name')
             name_element.text = value
             self._xml.append(name_element)
-
-    @property
-    def xml(self):
-        """
-        Return xml representaion of libvirt domain
-        """
-        return self._xml
-
-    @xml.setter
-    def xml(self, value):
-        self._xml = ElementTree.fromstring(value)

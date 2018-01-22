@@ -1,14 +1,16 @@
 """archvyrt libvirt network module"""
 
+# stdlib
 import ipaddress
 import logging
 import xml.etree.ElementTree as ElementTree
-import xml.dom.minidom
+# archvyrt
+from .xml import LibvirtXml
 
 LOG = logging.getLogger(__name__)
 
 
-class LibvirtNetwork:
+class LibvirtNetwork(LibvirtXml):
     """
     Libvirt Network device object
     """
@@ -19,6 +21,8 @@ class LibvirtNetwork:
 
         :param name - Short name of this network device (eth0, eth1, ...)
         """
+        super().__init__()
+
         try:
             self._ipv4 = kwargs.get('ipv4')
         except KeyError:
@@ -48,15 +52,6 @@ class LibvirtNetwork:
         model_element = ElementTree.Element('model')
         model_element.attrib['type'] = 'virtio'
         self._xml.append(model_element)
-
-    def __str__(self):
-        """
-        Return a pretty formatted XML
-        """
-        reparsed = xml.dom.minidom.parseString(
-            ElementTree.tostring(self._xml, encoding='unicode')
-        )
-        return reparsed.toprettyxml(indent="  ").strip()
 
     @property
     def name(self):
@@ -204,17 +199,3 @@ class LibvirtNetwork:
             return self.xml.find('mac').attrib['address']
         except (KeyError, TypeError):
             return None
-
-    @property
-    def xml(self):
-        """
-        XML representation of this network device
-        """
-        return self._xml
-
-    @xml.setter
-    def xml(self, value):
-        """
-        Update XML for interface
-        """
-        self._xml = value
