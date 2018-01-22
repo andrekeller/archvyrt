@@ -3,7 +3,7 @@
 # stdlib
 import logging
 # archvyrt
-from archvyrt.provisioner.base import Provisioner
+from .base import Provisioner
 
 LOG = logging.getLogger(__name__)
 

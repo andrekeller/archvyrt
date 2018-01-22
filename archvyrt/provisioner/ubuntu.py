@@ -5,7 +5,7 @@ import logging
 import os
 # archvyrt
 import archvyrt.tools as tools
-from archvyrt.provisioner.base import LinuxProvisioner
+from .base import LinuxProvisioner
 
 LOG = logging.getLogger(__name__)
 
