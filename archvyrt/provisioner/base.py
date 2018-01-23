@@ -80,12 +80,11 @@ class LinuxProvisioner(Provisioner):
     Linux Base Provisioner
     """
 
-    def __init__(self, domain, target="/provision", proxy=None):
+    def __init__(self, domain, target="/provision"):
         """
         Initializes and runs the provisioner.
         """
         super().__init__(domain)
-        self._proxy = proxy
         self._target = target
         self._uuid = {}
         self._cleanup = []
@@ -99,13 +98,6 @@ class LinuxProvisioner(Provisioner):
         self._access_config()
 
     @property
-    def proxy(self):
-        """
-        Proxy server used by this provisioner
-        """
-        return self._proxy
-
-    @property
     def target(self):
         """
         Temporary provisioning target, where the domains disks are mounted
@@ -117,9 +109,6 @@ class LinuxProvisioner(Provisioner):
         Runs a command, ensures proper environment
         """
         env = kwargs.pop('env', os.environ.copy())
-        if self.proxy:
-            env['http_proxy'] = 'http://%s' % self.proxy
-            env['ftp_proxy'] = 'http://%s' % self.proxy
         return self._runcmd(cmds, output, env=env, **kwargs)
 
     def runchroot(self, *cmds, output=False, add_env=None, **kwargs):

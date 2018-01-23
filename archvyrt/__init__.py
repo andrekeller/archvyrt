@@ -33,11 +33,6 @@ def main():
         prog='archvyrt',
     )
     parser.add_argument(
-        '--proxy',
-        default=None,
-        help='Proxy to use when running provisioning commands'
-    )
-    parser.add_argument(
         '--mountpoint',
         default='/provision',
         help='Temporary mountpoint for provisioning'
@@ -58,14 +53,14 @@ def main():
 
     if domain.guesttype == 'archlinux':
         os.mkdir(args.mountpoint)
-        provisioner = ArchlinuxProvisioner(domain, proxy=args.proxy)
+        provisioner = ArchlinuxProvisioner(domain)
         provisioner.cleanup()
         domain.autostart(True)
         domain.start()
         os.rmdir(args.mountpoint)
     elif domain.guesttype == 'ubuntu':
         os.mkdir(args.mountpoint)
-        provisioner = UbuntuProvisioner(domain, proxy=args.proxy)
+        provisioner = UbuntuProvisioner(domain)
         provisioner.cleanup()
         domain.autostart(True)
         domain.start()
