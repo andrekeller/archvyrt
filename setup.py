@@ -17,7 +17,7 @@ def find_version(source_file):
 
 setup(
     name='archvyrt',
-    version=find_version(Path('./archvyrt/version.py')),
+    version=find_version(str(Path('./archvyrt/version.py'))),
     description='libvirt provisioner for archlinux libvirt hosts',
     url='https://github.com/andrekeller/archvyrt',
     author='Andre Keller',
@@ -30,14 +30,13 @@ setup(
         'Topic :: System :: Systems Administration',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
     ],
 
     packages=find_packages(),
     install_requires=[
         'libvirt-python'
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.4',
     entry_points={
         'console_scripts': [
             'archvyrt = archvyrt:main',
