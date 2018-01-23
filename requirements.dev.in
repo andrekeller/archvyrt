@@ -1,0 +1,7 @@
+ipython
+libvirt-python
+pip-tools
+pylint
+sphinx
+sphinx_rtd_theme
+twine
