@@ -16,7 +16,6 @@ from archvyrt.provisioner import UbuntuProvisioner
 from archvyrt.version import __version__
 
 LOG = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
 
 
 def main():
@@ -33,6 +32,13 @@ def main():
         prog='archvyrt',
     )
     parser.add_argument(
+        '--log-level',
+        dest='loglevel',
+        default='info',
+        choices=['debug', 'info', 'warning', 'error', 'critical'],
+        help='Output log verbosity level'
+    )
+    parser.add_argument(
         '--mountpoint',
         default='/provision',
         help='Temporary mountpoint for provisioning'
@@ -47,6 +53,9 @@ def main():
         help='Path to VM definition file'
     )
     args = parser.parse_args()
+
+    logging.basicConfig(level=logging.getLevelName(args.loglevel.upper()),
+                        format='%(asctime)s - %(levelname)s - %(message)s')
 
     with open(args.vmdefinition) as jsonfile:
         domain = Domain(json.load(jsonfile))
