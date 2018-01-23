@@ -3,4 +3,4 @@ archvyrt
 
 a libvirt provisioner for archliunx libvirt hosts.
 
-check http://archvyrt.readthedocs.org.
+check https://archvyrt.readthedocs.org.
