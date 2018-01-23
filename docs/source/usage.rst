@@ -44,6 +44,7 @@ example vmdefinition::
           "bridge": "ovs0"
         }
       },
+      "rng": {},
       "access":
         "ssh-keys":
           "user@example.org": {
@@ -146,6 +147,24 @@ top-level object defining disks provisionend and assigned to a vm::
 multiple disks may be defined as in the example above. use a distinct target,
 supported fstypes currently are ``ext4`` and ``swap``.
 
+rng
+"""
+
+top-level key defining wether an virtio-rng shall be attached to the vm::
+
+    {
+      ...,
+      "rng": {
+        "bytes": 2048
+      },
+      ...
+
+This will add a virtio-rng seeded with max 2048 bytes per second from hosts
+``/dev/random`` to the vm. The 2048 bytes are the default value, which may be
+omitted.
+
+**NOTE** Only add virtio-rng devices if you can ensure that your hosts entropy
+pool is properly seeded (i.e. using a hardware rng).
 
 networks
 """"""""
