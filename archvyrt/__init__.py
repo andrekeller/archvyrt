@@ -33,18 +33,19 @@ def main():
         prog='archvyrt',
     )
     parser.add_argument(
-        '--proxy', dest='proxy',
+        '--proxy',
         default=None,
         help='Proxy to use when running provisioning commands'
     )
     parser.add_argument(
-        '--mountpoint', dest='mountpoint',
+        '--mountpoint',
         default='/provision',
         help='Temporary mountpoint for provisioning'
     )
     parser.add_argument(
-        '-v', '--version',
-        action='version', version='%(prog)s ' + __version__
+        '--version',
+        action='version',
+        version='%(prog)s ' + __version__
     )
     parser.add_argument(
         'vmdefinition',
