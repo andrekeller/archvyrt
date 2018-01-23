@@ -65,18 +65,25 @@ def main():
         provisioner = ArchlinuxProvisioner(domain)
         provisioner.cleanup()
         domain.autostart(True)
+        LOG.info('Enabled %s autostart', domain.fqdn)
         domain.start()
+        LOG.info('Started domain %s', domain.fqdn)
         os.rmdir(args.mountpoint)
     elif domain.guesttype == 'ubuntu':
         os.mkdir(args.mountpoint)
         provisioner = UbuntuProvisioner(domain)
         provisioner.cleanup()
         domain.autostart(True)
+        LOG.info('Enabled %s autostart', domain.fqdn)
         domain.start()
+        LOG.info('Started domain %s', domain.fqdn)
         os.rmdir(args.mountpoint)
     elif domain.guesttype == 'plain':
         provisioner = PlainProvisioner(domain)
         provisioner.cleanup()
         domain.autostart(True)
+        LOG.info('Enabled %s autostart', domain.fqdn)
     else:
         raise RuntimeError('Unsupported guest type: %s' % domain.guesttype)
+
+    LOG.info('Provisioning of %s (%s) completed', domain.fqdn, domain.guesttype)
