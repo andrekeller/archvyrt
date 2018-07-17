@@ -95,7 +95,7 @@ top-level key defining the provisioner used to create the vm::
 currently supported types are archlinux and plain
 
 * **archlinux**: Sets up a basic archlinux vm including network and disk config.
-* **ubuntu**: Sets up a basic ubuntu LTS (16.04) vm including network and disk config.
+* **ubuntu**: Sets up a basic ubuntu LTS (18.04) vm including network and disk config.
 * **plain**: Sets up an empty vm to manually install an operating system
   (f.e. using virt-manager)
 

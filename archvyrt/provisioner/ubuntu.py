@@ -20,11 +20,17 @@ class UbuntuProvisioner(LinuxProvisioner):
         Ubuntu base installation
         """
         LOG.info('Do Ubuntu installation')
+        apt_env = {'DEBIAN_FRONTEND': "noninteractive"}
         self.run(
             tools.DEBOOTSTRAP,
-            'xenial',
+            'bionic',
             self.target,
             'http://ch.archive.ubuntu.com/ubuntu/'
+        )
+        self.runchroot(
+            'apt-get',
+            'update',
+            add_env=apt_env
         )
 
     def _network_config(self):
@@ -33,6 +39,32 @@ class UbuntuProvisioner(LinuxProvisioner):
         """
         LOG.info('Setup guest networking')
 
+        apt_env = {'DEBIAN_FRONTEND': "noninteractive"}
+        self.runchroot(
+            'apt-get',
+            '-qy',
+            'install',
+            'ifupdown',
+            add_env=apt_env
+        )
+        self.runchroot(
+            'apt-get',
+            '-qy',
+            'purge',
+            'networkd-dispatcher',
+            'netplan.io',
+            'nplan',
+            add_env=apt_env
+        )
+        self.runchroot(
+            'systemctl',
+            'disable',
+            'systemd-resolved',
+        )
+        self.runchroot(
+            'rm',
+            '/etc/resolv.conf',
+        )
         # get provisioned interfaces
         interfaces = self.domain.xml.find('devices').findall('interface')
 
@@ -53,6 +85,13 @@ class UbuntuProvisioner(LinuxProvisioner):
                     'ATTR{address}=="%s", NAME="%s"' % (network.mac,
                                                         network.name)
                 )
+            self.writetargetfile(
+                '/etc/network/interfaces',
+                ['auto lo',
+                 'iface lo inet loopback',
+                 '',
+                 'source /etc/network/interfaces.d/*']
+            )
             self.writetargetfile(
                 '/etc/network/interfaces.d/%s' % network.name,
                 network.interfaces
@@ -83,11 +122,7 @@ class UbuntuProvisioner(LinuxProvisioner):
         self.writetargetfile('/etc/hosts', host_entries)
         if dns_servers:
             self.writetargetfile(
-                '/etc/resolvconf/resolv.conf.d/original',
-                dns_servers
-            )
-            self.writetargetfile(
-                '/etc/resolvconf/resolv.conf.d/tail',
+                '/etc/resolv.conf',
                 dns_servers
             )
 
