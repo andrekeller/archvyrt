@@ -185,8 +185,6 @@ class UbuntuProvisioner(LinuxProvisioner):
         Domain access configuration such as sudo/ssh and local users
         """
         LOG.info('Setup ssh/local user access')
-        self.writetargetfile('/usr/sbin/policy-rc.d', ['exit 101'])
-        self.chmodtargetfile('/usr/sbin/policy-rc.d', 0o555)
         apt_env = {'DEBIAN_FRONTEND': "noninteractive"}
         self.runchroot(
             'apt-get',
@@ -195,7 +193,6 @@ class UbuntuProvisioner(LinuxProvisioner):
             'ssh',
             add_env=apt_env
         )
-        self.deletetargetfile('/usr/sbin/policy-rc.d')
         if self.domain.password:
             self.runchroot(
                 'usermod',
